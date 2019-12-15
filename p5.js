@@ -37,8 +37,8 @@ class Program {
   setValueAt(index, value) { return this.tape[index] = value }
 }
 
-const computer = async (tape) => {
-  const program = new Program(tape)
+const execute = async (instructions) => {
+  const program = new Program(instructions)
 
   while(program.getHead() < program.tapeLength) {
     let value = program.readCurrentValue()
@@ -188,12 +188,18 @@ function getParam(value, mode, program) {
       break;
   }
 }
-// './p5_data.txt'
+
 fs.readFile('./p5_data.txt', 'utf8', function(err, data) {
-  let tape = data.split(',').map(Number)
+  let instructions = data.split(',').map(Number)
+
+  execute(instructions)
 })
 
-// TESTS
+/**
+ *  TESTS
+ *
+ *
+ */
 function programTest() {
   let program = new Program([1,2,3,4,5,6,7])
   let o = program.head
