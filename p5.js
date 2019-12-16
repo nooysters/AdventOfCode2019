@@ -37,6 +37,11 @@ class Program {
   setValueAt(index, value) { return this.tape[index] = value }
 }
 
+/**
+ * Takes an array of instructions and executes them.
+ *
+ * @param {array} instructions
+ */
 const execute = async (instructions) => {
   const program = new Program(instructions)
 
@@ -54,6 +59,8 @@ const execute = async (instructions) => {
 
   return program
 }
+
+// Instruction Helpers.
 
 function isInstruction(value = -1) {
   let code = Number(`${value}`.slice(-2))
@@ -92,6 +99,8 @@ function getOpMode(instruction) {
   }
 }
 
+// Operations.
+
 function add({ modes }, program) {
   const args = program.getParams(3)
   let output = args.pop()
@@ -112,27 +121,6 @@ function multiply({ modes }, program) {
   program.incrementHead(4)
 
   if (DEBUG_MODE) console.log("multiply", modes)
-}
-
-async function input({}, program) {
-  const input = await getInput("enter input: ")
-
-  program.setValueAt(program.getParams(1), input)
-  program.incrementHead(2)
-
-  if (DEBUG_MODE) console.log('input')
-}
-
-function getInput(query) {
-  const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-  });
-
-  return new Promise(resolve => rl.question(query, ans => {
-      rl.close();
-      resolve(ans);
-  }))
 }
 
 function output({}, program) {
@@ -174,6 +162,29 @@ function equals({ modes }, program) {
   program.incrementHead(4)
 }
 
+// Operation Helpers.
+
+function getInput(query) {
+  const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+  });
+
+  return new Promise(resolve => rl.question(query, ans => {
+      rl.close();
+      resolve(ans);
+  }))
+}
+
+async function input({}, program) {
+  const input = await getInput("enter input: ")
+
+  program.setValueAt(program.getParams(1), input)
+  program.incrementHead(2)
+
+  if (DEBUG_MODE) console.log('input')
+}
+
 function mapArgs(args, modes, program) {
   return args.map((p, i) => Number(getParam(p, modes[i], program)))
 }
@@ -189,6 +200,9 @@ function getParam(value, mode, program) {
   }
 }
 
+/**
+ * Read the test input and execute program.
+ */
 fs.readFile('./p5_data.txt', 'utf8', function(err, data) {
   let instructions = data.split(',').map(Number)
 
@@ -200,112 +214,112 @@ fs.readFile('./p5_data.txt', 'utf8', function(err, data) {
  *
  *
  */
-function programTest() {
-  let program = new Program([1,2,3,4,5,6,7])
-  let o = program.head
-  let h = program.incrementHead(2)
-  console.log(h === 2, program.readCurrentValue(), h, o)
+// function programTest() {
+//   let program = new Program([1,2,3,4,5,6,7])
+//   let o = program.head
+//   let h = program.incrementHead(2)
+//   console.log(h === 2, program.readCurrentValue(), h, o)
 
-  program = new Program([1,2,3,4,5,6,7])
-  console.log(program.readValueAt(3) === 4, program.readValueAt(3))
+//   program = new Program([1,2,3,4,5,6,7])
+//   console.log(program.readValueAt(3) === 4, program.readValueAt(3))
 
-  program = new Program([1,2,3,4,5,6,7])
-  program.head = 0
-  let args = program.getParams(3)
-  console.log(args.join('') === [2,3,4].join(''), args)
-}
+//   program = new Program([1,2,3,4,5,6,7])
+//   program.head = 0
+//   let args = program.getParams(3)
+//   console.log(args.join('') === [2,3,4].join(''), args)
+// }
 
-async function computerTest() {
-  console.log("computer test")
+// async function computerTest() {
+//   console.log("computer test")
 
-  let tape = [1101,100,-1,4,0]
-  let program = await computer(tape)
-  console.log("add imediate for both params", program.readValueAt(4) === 99, program.readValueAt(4))
+//   let tape = [1101,100,-1,4,0]
+//   let program = await computer(tape)
+//   console.log("add imediate for both params", program.readValueAt(4) === 99, program.readValueAt(4))
 
-  tape = [1001,2,3,4,5]
-  program = await computer(tape)
-  console.log("add mixed for both params", program.readValueAt(4) === 6, program.readValueAt(4))
+//   tape = [1001,2,3,4,5]
+//   program = await computer(tape)
+//   console.log("add mixed for both params", program.readValueAt(4) === 6, program.readValueAt(4))
 
-  tape = [101,2,3,4,5]
-  program = await computer(tape)
-  console.log("add mixed for both params", program.readValueAt(4) === 6, program.readValueAt(4))
+//   tape = [101,2,3,4,5]
+//   program = await computer(tape)
+//   console.log("add mixed for both params", program.readValueAt(4) === 6, program.readValueAt(4))
 
-  tape = [101,-2,3,4,5]
-  program = await computer(tape)
-  console.log("add mixed for both params with negative", program.readValueAt(4) === 2, program.readValueAt(4))
+//   tape = [101,-2,3,4,5]
+//   program = await computer(tape)
+//   console.log("add mixed for both params with negative", program.readValueAt(4) === 2, program.readValueAt(4))
 
-  tape = [1,3,3,4,5]
-  program = await computer(tape)
-  console.log("add positional for both params", program.readValueAt(4) === 8, program.readValueAt(4))
+//   tape = [1,3,3,4,5]
+//   program = await computer(tape)
+//   console.log("add positional for both params", program.readValueAt(4) === 8, program.readValueAt(4))
 
-  tape = [1102,100,-1,4,0]
-  program = await computer(tape)
-  console.log("multiply imediate for both params", program.readValueAt(4) === -100, program.readValueAt(4))
+//   tape = [1102,100,-1,4,0]
+//   program = await computer(tape)
+//   console.log("multiply imediate for both params", program.readValueAt(4) === -100, program.readValueAt(4))
 
-  tape = [1002,2,3,4,5]
-  program = await computer(tape)
-  console.log("multiply mixed for both params", program.readValueAt(4) === 9, program.readValueAt(4))
+//   tape = [1002,2,3,4,5]
+//   program = await computer(tape)
+//   console.log("multiply mixed for both params", program.readValueAt(4) === 9, program.readValueAt(4))
 
-  tape = [102,2,3,4,5]
-  program = await computer(tape)
-  console.log("multiply mixed for both params", program.readValueAt(4) === 8, program.readValueAt(4))
+//   tape = [102,2,3,4,5]
+//   program = await computer(tape)
+//   console.log("multiply mixed for both params", program.readValueAt(4) === 8, program.readValueAt(4))
 
-  tape = [102,-2,3,4,5]
-  program = await computer(tape)
-  console.log("multiply mixed for both params with negative", program.readValueAt(4) === -8, program.readValueAt(4))
+//   tape = [102,-2,3,4,5]
+//   program = await computer(tape)
+//   console.log("multiply mixed for both params with negative", program.readValueAt(4) === -8, program.readValueAt(4))
 
-  tape = [2,3,3,4,5]
-  program = await computer(tape)
-  console.log("multiply positional for both params", program.readValueAt(4) === 16, program.readValueAt(4))
-}
+//   tape = [2,3,3,4,5]
+//   program = await computer(tape)
+//   console.log("multiply positional for both params", program.readValueAt(4) === 16, program.readValueAt(4))
+// }
 
-function getOpModeTest() {
-  console.log('getOpMode test')
-  let result = getOpMode(1102)
-  console.log(result.opCode === 2)
-  console.log(result.modes.join('') === [1, 1, 0].join(''))
+// function getOpModeTest() {
+//   console.log('getOpMode test')
+//   let result = getOpMode(1102)
+//   console.log(result.opCode === 2)
+//   console.log(result.modes.join('') === [1, 1, 0].join(''))
 
-  result = getOpMode(02)
-  console.log(result.opCode === 2)
-  console.log(result.modes.join('') === [0, 0, 0].join(''))
+//   result = getOpMode(02)
+//   console.log(result.opCode === 2)
+//   console.log(result.modes.join('') === [0, 0, 0].join(''))
 
-  result = getOpMode(01)
-  console.log(result.opCode === 1)
-  console.log(result.modes.join('') === [0, 0, 0].join(''))
+//   result = getOpMode(01)
+//   console.log(result.opCode === 1)
+//   console.log(result.modes.join('') === [0, 0, 0].join(''))
 
-  result = getOpMode(1)
-  console.log(result.opCode === 1)
-  console.log(result.modes.join('') === [0, 0, 0].join(''))
+//   result = getOpMode(1)
+//   console.log(result.opCode === 1)
+//   console.log(result.modes.join('') === [0, 0, 0].join(''))
 
-  result = getOpMode(11102)
-  console.log(result.opCode === 2)
-  console.log(result.modes.join('') === [1, 1, 1].join(''))
+//   result = getOpMode(11102)
+//   console.log(result.opCode === 2)
+//   console.log(result.modes.join('') === [1, 1, 1].join(''))
 
-  result = getOpMode(1002)
-  console.log(result.opCode === 2)
-  console.log(result.modes.join('') === [0, 1, 0].join(''))
+//   result = getOpMode(1002)
+//   console.log(result.opCode === 2)
+//   console.log(result.modes.join('') === [0, 1, 0].join(''))
 
-  result = getOpMode(10002)
-  console.log(result.opCode === 2)
-  console.log(result.modes.join('') === [0, 0, 1].join(''))
-}
+//   result = getOpMode(10002)
+//   console.log(result.opCode === 2)
+//   console.log(result.modes.join('') === [0, 0, 1].join(''))
+// }
 
 
-function isInstructionTest() {
-  console.log('isInstructionTest')
-  console.log(isInstruction(0) === false)
-  console.log(isInstruction(1) === false)
-  console.log(isInstruction(2) === false)
-  console.log(isInstruction(3) === true)
-  console.log(isInstruction(4) === true)
-  console.log(isInstruction(102) === true)
-  console.log(isInstruction(22) === false)
-  console.log(isInstruction(202) === false)
-  console.log(isInstruction(102) === true)
-  console.log(isInstruction(20102) === false)
-  console.log(isInstruction(11104) === true)
-  console.log(isInstruction(10002) === true)
-  console.log(isInstruction(10001) === true)
-  console.log(isInstruction(11112) === false)
-  console.log(isInstruction(11111) === false)
-}
+// function isInstructionTest() {
+//   console.log('isInstructionTest')
+//   console.log(isInstruction(0) === false)
+//   console.log(isInstruction(1) === false)
+//   console.log(isInstruction(2) === false)
+//   console.log(isInstruction(3) === true)
+//   console.log(isInstruction(4) === true)
+//   console.log(isInstruction(102) === true)
+//   console.log(isInstruction(22) === false)
+//   console.log(isInstruction(202) === false)
+//   console.log(isInstruction(102) === true)
+//   console.log(isInstruction(20102) === false)
+//   console.log(isInstruction(11104) === true)
+//   console.log(isInstruction(10002) === true)
+//   console.log(isInstruction(10001) === true)
+//   console.log(isInstruction(11112) === false)
+//   console.log(isInstruction(11111) === false)
+// }
